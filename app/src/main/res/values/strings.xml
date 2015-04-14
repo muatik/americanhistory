@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">AmericanHistory</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="dialog">Settings</string>
+    <string name="translation_title">Translation</string>
+    <string name="error_translation_parsing">Cannot translate this word. This may be temporary.</string>
+    <string name="error_translation_io">Cannot translate this word due to a network issue.</string>
+    <string name="error_storyAPI_io">Cannot fetch this article from internet due to a network issue.</string>
+
+</resources>

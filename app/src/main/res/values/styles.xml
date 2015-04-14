@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+
+    </style>
+
+    <style name="DisplayEditorDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>

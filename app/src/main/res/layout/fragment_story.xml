@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="@dimen/frame_content_padding"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/storyProgress"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center">
+        <ProgressBar
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:indeterminateOnly="true"
+            />
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/storyView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="24dp" />
+
+            <LinearLayout
+                android:id="@+id/media_player"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:src="@android:drawable/ic_media_play"
+                    android:background="@null"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <SeekBar
+                    android:id="@+id/player_progress"
+                    android:max="300"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_menu_manage"
+                    android:background="@null" />
+                </LinearLayout>
+
+            <TextView
+                android:textIsSelectable="true"
+                android:paddingTop="16dp"
+                android:id="@+id/detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18dp" />
+            </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>
