@@ -198,6 +198,10 @@ public class FragmentStory extends FragmentDebug
 
 
     protected void showTranslation(String keyword) {
+        keyword = keyword.replaceAll("\\s","");
+        if (keyword == "")
+            return;
+
         Bundle bundle = new Bundle();
         bundle.putString(TranslationBox.KEYWORD, keyword);
 

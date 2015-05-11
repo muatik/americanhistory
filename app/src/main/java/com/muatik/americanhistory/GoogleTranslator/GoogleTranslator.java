@@ -59,10 +59,16 @@ public class GoogleTranslator {
 
         try {
             JSONArray rawjson = fetchJson(keyword);
-
-            JSONArray brief = (JSONArray)((JSONArray) rawjson.get(0)).get(0);
+            JSONArray brief;
 
             Translation translation = new Translation();
+            try {
+                brief = (JSONArray)((JSONArray) rawjson.get(0)).get(0);
+            } catch (Exception e) {
+                // get no translation.
+                return translation;
+            }
+
             translation.text = brief.get(1).toString();
             translation.firstTranslation = brief.get(0).toString();
 

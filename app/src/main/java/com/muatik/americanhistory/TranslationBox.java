@@ -1,6 +1,7 @@
 package com.muatik.americanhistory;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import butterknife.ButterKnife;
@@ -30,6 +32,10 @@ public class TranslationBox extends DialogFragment {
     protected String keyword;
 
     @InjectView(R.id.keyword) TextView keywordView;
+    @InjectView(R.id.translation) TextView firstTranslationView;
+    @InjectView(R.id.translationProgress) View translationProgress;
+    @InjectView(R.id.main) View mainView;
+
     private String lastErrorMsg;
 
     @Override
@@ -37,7 +43,16 @@ public class TranslationBox extends DialogFragment {
         View view = inflater.inflate(R.layout.translation_box, container, false);
         getDialog().setTitle(R.string.translation_title);
         ButterKnife.inject(this, view);
+
         return view;
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        // request a window without the title
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
     }
 
     @Override
@@ -75,7 +90,8 @@ public class TranslationBox extends DialogFragment {
             super.onPostExecute(translation);
             if (keywordView ==null)
                 return;
-
+            translationProgress.setVisibility(View.GONE);
+            mainView.setVisibility(View.VISIBLE);
             if (translation != null)
                 onTranslationCompleted(translation);
             else
@@ -84,13 +100,14 @@ public class TranslationBox extends DialogFragment {
     }
 
     private void onTranslationCompleted(Translation translation) {
-        keywordView.setText(translation.firstTranslation);
+        keywordView.setText(keyword);
+        firstTranslationView.setText(translation.firstTranslation);
 
         for (Translation.GroupedTranslation i: translation.translations) {
             View item = getActivity().getLayoutInflater().inflate(R.layout.translation_item, null);
             TextView groupName = (TextView) item.findViewById(R.id.groupName);
             TextView words = (TextView) item.findViewById(R.id.words);
-            groupName.setText(i.groupName);
+            groupName.setText(i.groupName+": ");
 
             for (Object w: i.translations.toArray()) {
                 words.setText(words.getText() + w.toString() + ", " );
