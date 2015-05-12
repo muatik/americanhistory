@@ -30,7 +30,7 @@ public class GoogleTranslator {
     public static final String TAG = "GoogleTranslator";
 
     protected final static String clientUrl = "https://translate.google.com/translate_a/single?client=t&sl=en&tl=tr&dt=t&hl=tr&dt=bd&dt=ld&ie=UTF-8&oe=UTF-8&otf=1&ssel=0&tsel=0&q=";
-    protected static int timeout = 10;
+    protected static int timeout = 6;
 
     public static class Translation
     {

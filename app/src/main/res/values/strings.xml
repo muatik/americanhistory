@@ -9,5 +9,7 @@
     <string name="error_translation_io">Cannot translate this word due to a network issue.</string>
     <string name="error_storyAPI_io">Cannot fetch this article from internet due to a network issue.</string>
     <string name="translation_not_available">translation not available.</string>
+    <string name="word_favorited">inserted into your vocabulary</string>
+    <string name="word_unfavorited">removed from your vocabulary</string>
 
 </resources>

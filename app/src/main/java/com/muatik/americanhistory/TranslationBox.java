@@ -12,15 +12,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
+
 import com.muatik.americanhistory.GoogleTranslator.GoogleTranslator;
 import com.muatik.americanhistory.GoogleTranslator.GoogleTranslator.Translation;
+import com.muatik.americanhistory.Vocabulary.Collection;
+import com.muatik.americanhistory.Vocabulary.Word;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -30,20 +38,30 @@ public class TranslationBox extends DialogFragment {
 
     public final static String KEYWORD = "keyword";
     protected String keyword;
+    Translation translation;
 
     @InjectView(R.id.keyword) TextView keywordView;
     @InjectView(R.id.translation) TextView firstTranslationView;
     @InjectView(R.id.translationProgress) View translationProgress;
     @InjectView(R.id.main) View mainView;
+    @InjectView(R.id.alert) View alertView;
+    @InjectView(R.id.alertMessage) TextView alertMessage;
+    @InjectView(R.id.favoriteToggle) ToggleButton favoriteToggle;
 
     private String lastErrorMsg;
+    private Collection vocabulary;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        vocabulary = new Collection(getActivity());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.translation_box, container, false);
-        getDialog().setTitle(R.string.translation_title);
         ButterKnife.inject(this, view);
-
+        startTranslation();
         return view;
     }
 
@@ -65,9 +83,19 @@ public class TranslationBox extends DialogFragment {
             throw new IllegalArgumentException(msg);
         }
         super.onAttach(activity);
-        new TranslationTask().execute(keyword);
     }
 
+    private void startTranslation(String keyword) {
+        this.keyword = keyword;
+        startTranslation();
+    }
+
+    private void startTranslation() {
+        alertView.setVisibility(View.GONE);
+        mainView.setVisibility(View.GONE);
+        translationProgress.setVisibility(View.VISIBLE);
+        new TranslationTask().execute(keyword);
+    }
 
     class TranslationTask extends AsyncTask<String, Long, Translation> {
 
@@ -88,23 +116,38 @@ public class TranslationBox extends DialogFragment {
         @Override
         protected void onPostExecute(Translation translation) {
             super.onPostExecute(translation);
-            if (keywordView ==null)
+            if (keywordView == null)
                 return;
+
             translationProgress.setVisibility(View.GONE);
-            mainView.setVisibility(View.VISIBLE);
+
             if (translation != null)
                 onTranslationCompleted(translation);
             else
-                keywordView.setText(lastErrorMsg);
+                onTranslationFailed();
         }
     }
 
+    private void onTranslationFailed() {
+        alertView.setVisibility(View.VISIBLE);
+        alertMessage.setText(lastErrorMsg);
+    }
+
     private void onTranslationCompleted(Translation translation) {
+        this.translation = translation;
         keywordView.setText(keyword);
         firstTranslationView.setText(translation.firstTranslation);
 
+        LayoutInflater inflater;
+        try {
+            inflater = getActivity().getLayoutInflater();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return;
+        }
+
         for (Translation.GroupedTranslation i: translation.translations) {
-            View item = getActivity().getLayoutInflater().inflate(R.layout.translation_item, null);
+            View item = inflater.inflate(R.layout.translation_item, null);
             TextView groupName = (TextView) item.findViewById(R.id.groupName);
             TextView words = (TextView) item.findViewById(R.id.words);
             groupName.setText(i.groupName+": ");
@@ -117,10 +160,46 @@ public class TranslationBox extends DialogFragment {
         }
 
 
+        // if the word is already in the vocabulary, the word view should be displayed as favorited
+        try {
+            Word word = vocabulary.get(keyword);
+            favoriteToggle.setChecked(true);
+        } catch (Exception e) {}
+
+        mainView.setVisibility(View.VISIBLE);
+    }
 
 
+    private void removeVocabulary() {
+        vocabulary.remove(keyword);
+        Toast.makeText(getActivity(), R.string.word_unfavorited, Toast.LENGTH_SHORT).show();
+    }
+
+    private void insertVocabulary() {
+        Word w = new Word();
+        w.word = keyword;
+        w.translation= translation.firstTranslation;
+        w.detail = translation.translations.toString();
+        vocabulary.insert(w);
+        Toast.makeText(getActivity(), R.string.word_favorited, Toast.LENGTH_SHORT).show();
+    }
 
 
+    @OnClick(R.id.favoriteToggle)
+    public void favoriteClicked(ToggleButton toggle) {
+        Boolean favorited = toggle.isChecked();
+        Log.d(MainActivity.TAG, "favorite: " + favorited);
+
+        if (favorited)
+            insertVocabulary();
+        else
+            removeVocabulary();
+
+        Log.e(MainActivity.TAG, "=========");
+        List<Word> words =  vocabulary.getList();
+        for(Word i: words) {
+            Log.e(MainActivity.TAG, i.word +  ":"  + i.translation);
+        }
     }
 
 }

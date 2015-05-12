@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.muatik.americanhistory.FragmentTitles.IFragmentTitles;
+import com.muatik.americanhistory.Vocabulary.Collection;
+import com.muatik.americanhistory.Vocabulary.Word;
 import com.squareup.otto.Bus;
 
 

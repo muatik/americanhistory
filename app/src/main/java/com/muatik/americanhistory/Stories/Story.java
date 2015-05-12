@@ -14,5 +14,4 @@ public class Story {
     public boolean availableOffline;
     public int scrollPosition;
 
-
 }
