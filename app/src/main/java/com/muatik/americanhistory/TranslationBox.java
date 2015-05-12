@@ -188,18 +188,10 @@ public class TranslationBox extends DialogFragment {
     @OnClick(R.id.favoriteToggle)
     public void favoriteClicked(ToggleButton toggle) {
         Boolean favorited = toggle.isChecked();
-        Log.d(MainActivity.TAG, "favorite: " + favorited);
-
         if (favorited)
             insertVocabulary();
         else
             removeVocabulary();
-
-        Log.e(MainActivity.TAG, "=========");
-        List<Word> words =  vocabulary.getList();
-        for(Word i: words) {
-            Log.e(MainActivity.TAG, i.word +  ":"  + i.translation);
-        }
     }
 
 }
