@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.muatik.americanhistory.Stories.API.StoryFetchTask;
 import com.muatik.americanhistory.Stories.Story;
@@ -197,16 +198,11 @@ public class FragmentStory extends FragmentDebug
 
 
     protected void showTranslation(String keyword) {
-        keyword = keyword.replaceAll("\\s","");
-        if (keyword == "")
-            return;
-
-        Bundle bundle = new Bundle();
-        bundle.putString(TranslationBox.KEYWORD, keyword);
-
-        TranslationBox translationBox = new TranslationBox();
-        translationBox.setArguments(bundle);
-        translationBox.setTargetFragment(this, 0);
-        translationBox.show(getFragmentManager(), null);
+        try {
+            TranslationBoxHelper.show(this, keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }

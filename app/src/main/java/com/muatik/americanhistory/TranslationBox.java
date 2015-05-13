@@ -23,6 +23,7 @@ import com.muatik.americanhistory.GoogleTranslator.GoogleTranslator;
 import com.muatik.americanhistory.GoogleTranslator.GoogleTranslator.Translation;
 import com.muatik.americanhistory.Vocabulary.Collection;
 import com.muatik.americanhistory.Vocabulary.Word;
+import com.squareup.otto.Bus;
 
 import org.json.JSONException;
 
@@ -50,11 +51,13 @@ public class TranslationBox extends DialogFragment {
 
     private String lastErrorMsg;
     private Collection vocabulary;
+    private Bus bus;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         vocabulary = new Collection(getActivity());
+        bus = BusProvider.get();
     }
 
     @Override
@@ -79,7 +82,6 @@ public class TranslationBox extends DialogFragment {
         keyword = bundle.getString(KEYWORD);
         if (keyword == null) {
             String msg = "TranslationBox could not find keyword in bundle arguments.";
-            Log.d(MainActivity.TAG, msg);
             throw new IllegalArgumentException(msg);
         }
         super.onAttach(activity);
@@ -172,6 +174,7 @@ public class TranslationBox extends DialogFragment {
 
     private void removeVocabulary() {
         vocabulary.remove(keyword);
+        bus.post(new EventRemoveVocabulary(keyword));
         Toast.makeText(getActivity(), R.string.word_unfavorited, Toast.LENGTH_SHORT).show();
     }
 
@@ -181,6 +184,7 @@ public class TranslationBox extends DialogFragment {
         w.translation= translation.firstTranslation;
         w.detail = null;
         vocabulary.insert(w);
+        bus.post(new EventInsterVocabulary(w));
         Toast.makeText(getActivity(), R.string.word_favorited, Toast.LENGTH_SHORT).show();
     }
 
@@ -192,6 +196,20 @@ public class TranslationBox extends DialogFragment {
             insertVocabulary();
         else
             removeVocabulary();
+
     }
 
+    public class EventInsterVocabulary {
+        public Word word;
+        public EventInsterVocabulary(Word word) {
+            this.word = word;
+        }
+    }
+
+    public class EventRemoveVocabulary {
+        public String keyword;
+        public EventRemoveVocabulary(String keyword) {
+            this.keyword = keyword;
+        }
+    }
 }
