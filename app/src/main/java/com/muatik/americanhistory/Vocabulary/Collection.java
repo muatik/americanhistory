@@ -4,8 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.muatik.americanhistory.DB.DBHelper;
+import com.muatik.americanhistory.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +53,7 @@ public class Collection {
     public Word get(String word) {
         Cursor c = db.rawQuery(
                 "select * from " + TABLE_VOCABULARY + " where "
-                        + CWORD + " = \"" + String.valueOf(word) + "\" limit 1", null);
+                        + CWORD + " = \"" + word.toLowerCase() + "\" limit 1", null);
         c.moveToNext();
         return WordBuilder(c);
     }
@@ -66,13 +68,16 @@ public class Collection {
 
     public void insert(Word word) {
         ContentValues values = new ContentValues();
-        values.put(CWORD, word.word);
+        values.put(CWORD, word.word.toLowerCase());
         values.put(CTRANSLATION, word.translation);
         values.put(CDETAIL, word.detail);
+        Log.e(MainActivity.TAG, word.word.toLowerCase());
         db.insert(TABLE_VOCABULARY, null, values);
     }
 
     public void remove(String keyword) {
+        keyword = keyword.toLowerCase();
+        Log.e(MainActivity.TAG, keyword.toLowerCase());
         db.delete(TABLE_VOCABULARY, CWORD + " = \"" + keyword + "\"", null);
     }
 
