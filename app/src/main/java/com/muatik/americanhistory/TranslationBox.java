@@ -179,7 +179,7 @@ public class TranslationBox extends DialogFragment {
         Word w = new Word();
         w.word = keyword;
         w.translation= translation.firstTranslation;
-        w.detail = translation.translations.toString();
+        w.detail = null;
         vocabulary.insert(w);
         Toast.makeText(getActivity(), R.string.word_favorited, Toast.LENGTH_SHORT).show();
     }

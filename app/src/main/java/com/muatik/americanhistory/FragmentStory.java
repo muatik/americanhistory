@@ -45,7 +45,6 @@ public class FragmentStory extends FragmentDebug
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.fragment_story, container, false);
         ButterKnife.inject(this, mainView);
-        Log.d(MainActivity.TAG, "onCreateView");
         return mainView;
     }
 
