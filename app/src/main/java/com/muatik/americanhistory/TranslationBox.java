@@ -6,11 +6,13 @@ import android.app.DialogFragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -30,6 +32,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -52,6 +55,7 @@ public class TranslationBox extends DialogFragment {
     private String lastErrorMsg;
     private Collection vocabulary;
     private Bus bus;
+    private TextToSpeech tts = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,6 +89,13 @@ public class TranslationBox extends DialogFragment {
             throw new IllegalArgumentException(msg);
         }
         super.onAttach(activity);
+    }
+
+    @Override
+    public void onStop() {
+        if (tts !=null)
+            tts.stop();
+        super.onStop();
     }
 
     private void startTranslation(String keyword) {
@@ -169,8 +180,24 @@ public class TranslationBox extends DialogFragment {
         } catch (Exception e) {}
 
         mainView.setVisibility(View.VISIBLE);
+        startSpeaking(keyword);
     }
 
+    private void startSpeaking(final String text) {
+        if (tts == null)
+            tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if(status == TextToSpeech.SUCCESS) {
+                        tts.setLanguage(Locale.US);
+                        tts.setSpeechRate(0.7f);
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                }
+            });
+        else
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+    }
 
     private void removeVocabulary() {
         vocabulary.remove(keyword);
@@ -188,6 +215,10 @@ public class TranslationBox extends DialogFragment {
         Toast.makeText(getActivity(), R.string.word_favorited, Toast.LENGTH_SHORT).show();
     }
 
+    @OnClick(R.id.speak)
+    public void speakClicked(ImageButton button) {
+        startSpeaking(keyword);
+    }
 
     @OnClick(R.id.favoriteToggle)
     public void favoriteClicked(ToggleButton toggle) {

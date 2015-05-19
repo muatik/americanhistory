@@ -65,6 +65,8 @@ public class FragmentTitles extends FragmentDebug {
             }
         });
 
+        ((MainActivity) getActivity()).setActionBarTitle("American History");
+
         return view;
     }
 }

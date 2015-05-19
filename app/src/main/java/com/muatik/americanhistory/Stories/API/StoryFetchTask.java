@@ -8,6 +8,7 @@ import com.muatik.americanhistory.MainActivity;
 import com.muatik.americanhistory.Stories.Story;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 /**
  * Created by muatik on 24.03.2015.
@@ -21,10 +22,10 @@ public class StoryFetchTask extends AsyncTask<Long, Story, Story> {
         void onStoryFetchFailed(Exception e);
     }
 
-    private IStoryFetchTask caller;
+    private WeakReference<IStoryFetchTask> weakCaller;
 
     public StoryFetchTask(IStoryFetchTask caller){
-        this.caller = caller;
+        this.weakCaller = new WeakReference<IStoryFetchTask>(caller);
     }
 
     @Override
@@ -42,10 +43,14 @@ public class StoryFetchTask extends AsyncTask<Long, Story, Story> {
     @Override
     protected void onPostExecute(Story story) {
         super.onPostExecute(story);
+        IStoryFetchTask caller = weakCaller.get();
+        if (caller == null)
+            return;
+
         if (story != null)
-            this.caller.onStoryFetchCompleted(story);
+            caller.onStoryFetchCompleted(story);
         else
-            this.caller.onStoryFetchFailed(lastError);
+            caller.onStoryFetchFailed(lastError);
     }
 
 }

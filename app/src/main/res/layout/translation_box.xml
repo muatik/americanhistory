@@ -61,6 +61,12 @@
                 android:layout_height="wrap_content"
                 android:textSize="20dp"
                 android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/speak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:src="@android:drawable/ic_btn_speak_now" />
             </LinearLayout>
 
 

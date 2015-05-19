@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +83,11 @@ public class FragmentVocabulary extends Fragment {
         }
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -102,8 +108,14 @@ public class FragmentVocabulary extends Fragment {
         });
 
         BusProvider.get().register(this);
+        updateActionBarTitle();
 
         return view;
+    }
+
+    private void updateActionBarTitle() {
+        ((MainActivity) getActivity()).setActionBarTitle(
+                String.valueOf(words.size()) + " words in your vocabulary");
     }
 
     private void wordSelected(String keyword) {
@@ -119,12 +131,14 @@ public class FragmentVocabulary extends Fragment {
     public void onWordRemoved(TranslationBox.EventRemoveVocabulary e) {
         vocabularyAdapter.remove(e.keyword);
         vocabularyAdapter.notifyDataSetChanged();
+        updateActionBarTitle();
     }
 
     @Subscribe
     public void onWordInserted(TranslationBox.EventInsterVocabulary e) {
         vocabularyAdapter.add(e.word);
         vocabularyAdapter.notifyDataSetChanged();
+        updateActionBarTitle();
     }
 
 }

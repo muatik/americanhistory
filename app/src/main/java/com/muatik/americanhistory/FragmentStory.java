@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +20,8 @@ import com.muatik.americanhistory.Stories.Story;
 import com.squareup.otto.Subscribe;
 import com.muatik.americanhistory.DisplayEditor.*;
 
+
+import java.lang.ref.WeakReference;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -125,12 +126,20 @@ public class FragmentStory extends FragmentDebug
     }
 
     @Override
+    public void onStop() {
+        BusProvider.get().unregister(this);
+        super.onStop();
+    }
+
+    @Override
     public void onTitleSelected(Long id) {
+        ((MainActivity) getActivity()).setActionBarTitle("loading...");
         new StoryFetchTask(this).execute(Long.valueOf(4));
     }
 
     @Override
     public void onStoryFetchCompleted(Story story) {
+        ((MainActivity) getActivity()).setActionBarTitle(story.title);
         viewTitle.setText(story.title);
         viewDetail.setText(story.detail);
         storyProgress.setVisibility(View.GONE);

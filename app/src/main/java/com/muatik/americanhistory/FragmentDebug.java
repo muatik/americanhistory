@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 public class FragmentDebug extends Fragment {
 
     public void log(String s) {
-        Log.d("debuga", getClass() + " " + s);
+        Log.w("debuga", getClass() + " " + s);
     }
 
     @Override

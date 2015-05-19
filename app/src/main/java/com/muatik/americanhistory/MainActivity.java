@@ -8,8 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.muatik.americanhistory.FragmentTitles.IFragmentTitles;
-import com.muatik.americanhistory.Vocabulary.Collection;
-import com.muatik.americanhistory.Vocabulary.Word;
 import com.squareup.otto.Bus;
 
 
@@ -35,7 +33,7 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
+        if (getFragmentManager().getBackStackEntryCount() > 1) {
             getFragmentManager().popBackStack();
         } else {
             super.onBackPressed();
@@ -99,7 +97,8 @@ public class MainActivity extends ActionBarActivity
         }
     }
 
-    public void showModalClick(MenuItem item) {
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 
 }
