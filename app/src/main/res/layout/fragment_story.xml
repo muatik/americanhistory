@@ -39,6 +39,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
                 <ImageButton
+                    android:id="@+id/audio_play"
                     android:src="@android:drawable/ic_media_play"
                     android:background="@null"
                     android:layout_width="wrap_content"
