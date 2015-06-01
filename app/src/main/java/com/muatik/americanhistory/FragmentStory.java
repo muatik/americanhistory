@@ -1,8 +1,10 @@
 package com.muatik.americanhistory;
 
+import android.app.Application;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -24,6 +26,9 @@ import com.muatik.americanhistory.Stories.Story;
 import com.squareup.otto.Subscribe;
 import com.muatik.americanhistory.DisplayEditor.*;
 
+
+import java.io.IOException;
+import java.net.URI;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -222,7 +227,32 @@ public class FragmentStory extends FragmentDebug
     }
 
     public void setMediaPlayerSource(String audioUrl){
-        player = MediaPlayer.create(getActivity(),R.raw.aaa);
+        player = new MediaPlayer();
+        try {
+            player.setDataSource("http://users.skynet.be/fa046054/home/P22/track06.mp3");
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (SecurityException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (IllegalStateException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            player.prepare();
+        } catch (IllegalStateException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        }
+
         playerBar = (SeekBar) getActivity().findViewById(R.id.player_progress);
         playerBar.setMax(player.getDuration());
         playerBar.setOnTouchListener(new View.OnTouchListener() {
