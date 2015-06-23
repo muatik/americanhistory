@@ -39,22 +39,18 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
                 <ImageButton
-                    android:id="@+id/audio_play"
+                    android:id="@+id/play"
                     android:src="@android:drawable/ic_media_play"
                     android:background="@null"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <SeekBar
+                    android:layout_marginLeft="5dp"
                     android:id="@+id/player_progress"
                     android:max="300"
                     android:layout_weight="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@android:drawable/ic_menu_manage"
-                    android:background="@null" />
                 </LinearLayout>
 
             <TextView

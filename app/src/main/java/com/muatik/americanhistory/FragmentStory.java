@@ -7,7 +7,9 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.muatik.americanhistory.Stories.API.StoryFetchTask;
 import com.muatik.americanhistory.Stories.Story;
+import com.muatik.americanhistory.Vocabulary.StoryPlayer;
 import com.squareup.otto.Subscribe;
 import com.muatik.americanhistory.DisplayEditor.*;
 
@@ -43,9 +46,8 @@ public class FragmentStory extends FragmentDebug
 
     protected  Long id;
     protected SharedPreferences preferences;
-    protected MediaPlayer player;
-    protected SeekBar playerBar;
-    protected String playerStatus="stop";
+    protected StoryPlayer player;
+    protected String playerStatus="stopped";
 
     View mainView;
     @InjectView(R.id.detail) TextView viewDetail;
@@ -53,6 +55,7 @@ public class FragmentStory extends FragmentDebug
     @InjectView(R.id.storyProgress) View storyProgress;
     @InjectView(R.id.storyView) View storyView;
     @InjectView(R.id.media_player) View mediaPlayerView;
+    @InjectView(R.id.player_progress) SeekBar seekbar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -138,7 +141,11 @@ public class FragmentStory extends FragmentDebug
 
     @Override
     public void onStop() {
-        BusProvider.get().unregister(this);
+        try {
+            BusProvider.get().unregister(this);
+        } catch (Exception e) {
+
+        }
         super.onStop();
     }
 
@@ -155,7 +162,6 @@ public class FragmentStory extends FragmentDebug
         viewDetail.setText(story.detail);
         storyProgress.setVisibility(View.GONE);
         storyView.setVisibility(View.VISIBLE);
-        setMediaPlayerSource("Test.mp3");
     }
 
     @Override
@@ -196,7 +202,6 @@ public class FragmentStory extends FragmentDebug
                 .edit().putString(DisplayEditor.BG_COLOR, event.backgroundColor).apply();
     }
 
-
     protected void setBackgroundColor(String color) {
         mainView.setBackgroundColor(Color.parseColor(color));
     }
@@ -226,65 +231,34 @@ public class FragmentStory extends FragmentDebug
         }
     }
 
-    public void setMediaPlayerSource(String audioUrl){
-        player = new MediaPlayer();
-        try {
-            player.setDataSource("http://users.skynet.be/fa046054/home/P22/track06.mp3");
-        } catch (IllegalArgumentException e) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
-        } catch (SecurityException e) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
-        } catch (IllegalStateException e) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            player.prepare();
-        } catch (IllegalStateException e) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
-        }
-
-        playerBar = (SeekBar) getActivity().findViewById(R.id.player_progress);
-        playerBar.setMax(player.getDuration());
-        playerBar.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                seekChange(v);
-                return false;
-            }
-        });
-    }
-
-    @OnClick(R.id.audio_play)
+    @OnClick(R.id.play)
     public void audioPlay(View view) {
-        ImageButton audioPlay = (ImageButton) getActivity().findViewById(R.id.audio_play);
-        if (playerStatus == "stop") {
-            player.setVolume(1.0f, 1.0f);
-            player.start();
+        final ImageButton audioPlay = (ImageButton) view;
+        String url = "http://av.voanews.com/clips/VLE/2015/06/16/5746df4f-750a-4f17-b1ca-d717d0e69bc1.mp3";
+        if (playerStatus == "stopped") {
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
+            audioPlay.refreshDrawableState();
             playerStatus = "playing";
-        }else if (playerStatus =="playing") {
+
+            StoryPlayer.set(url, seekbar);
+            StoryPlayer.play();
+            StoryPlayer.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    audioPlay.setImageResource(android.R.drawable.ic_media_play);
+                    StoryPlayer.resetProgress();
+                }
+            });
+
+        } else if (playerStatus =="playing") {
             audioPlay.setImageResource(android.R.drawable.ic_media_play);
             playerStatus="pause";
-            player.pause();
-        }else if (playerStatus =="pause") {
+            StoryPlayer.pause();
+        } else if (playerStatus =="pause") {
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
             playerStatus="playing";
-            player.start();
+            StoryPlayer.play();
         }
     }
 
-    private void seekChange(View v){
-        SeekBar sb = (SeekBar)v;
-        player.seekTo(sb.getProgress());
-    }
 }
