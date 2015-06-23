@@ -1,8 +1,11 @@
 package com.muatik.americanhistory;
 
+import android.app.Application;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.ActionMode;
@@ -10,8 +13,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,10 +27,12 @@ import com.squareup.otto.Subscribe;
 import com.muatik.americanhistory.DisplayEditor.*;
 
 
-import java.lang.ref.WeakReference;
+import java.io.IOException;
+import java.net.URI;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Created by muatik on 23.03.2015.
@@ -35,6 +43,9 @@ public class FragmentStory extends FragmentDebug
 
     protected  Long id;
     protected SharedPreferences preferences;
+    protected MediaPlayer player;
+    protected SeekBar playerBar;
+    protected String playerStatus="stop";
 
     View mainView;
     @InjectView(R.id.detail) TextView viewDetail;
@@ -144,6 +155,7 @@ public class FragmentStory extends FragmentDebug
         viewDetail.setText(story.detail);
         storyProgress.setVisibility(View.GONE);
         storyView.setVisibility(View.VISIBLE);
+        setMediaPlayerSource("Test.mp3");
     }
 
     @Override
@@ -185,7 +197,6 @@ public class FragmentStory extends FragmentDebug
     }
 
 
-
     protected void setBackgroundColor(String color) {
         mainView.setBackgroundColor(Color.parseColor(color));
     }
@@ -213,5 +224,67 @@ public class FragmentStory extends FragmentDebug
             e.printStackTrace();
             Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void setMediaPlayerSource(String audioUrl){
+        player = new MediaPlayer();
+        try {
+            player.setDataSource("http://users.skynet.be/fa046054/home/P22/track06.mp3");
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (SecurityException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (IllegalStateException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            player.prepare();
+        } catch (IllegalStateException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "You might not set the URI correctly!", Toast.LENGTH_LONG).show();
+        }
+
+        playerBar = (SeekBar) getActivity().findViewById(R.id.player_progress);
+        playerBar.setMax(player.getDuration());
+        playerBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                seekChange(v);
+                return false;
+            }
+        });
+    }
+
+    @OnClick(R.id.audio_play)
+    public void audioPlay(View view) {
+        ImageButton audioPlay = (ImageButton) getActivity().findViewById(R.id.audio_play);
+        if (playerStatus == "stop") {
+            player.setVolume(1.0f, 1.0f);
+            player.start();
+            audioPlay.setImageResource(android.R.drawable.ic_media_pause);
+            playerStatus = "playing";
+        }else if (playerStatus =="playing") {
+            audioPlay.setImageResource(android.R.drawable.ic_media_play);
+            playerStatus="pause";
+            player.pause();
+        }else if (playerStatus =="pause") {
+            audioPlay.setImageResource(android.R.drawable.ic_media_pause);
+            playerStatus="playing";
+            player.start();
+        }
+    }
+
+    private void seekChange(View v){
+        SeekBar sb = (SeekBar)v;
+        player.seekTo(sb.getProgress());
     }
 }
