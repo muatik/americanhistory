@@ -240,7 +240,7 @@ public class FragmentStory extends FragmentDebug
             audioPlay.refreshDrawableState();
             playerStatus = "playing";
 
-            StoryPlayer.set(url, seekbar);
+            StoryPlayer.set(url, seekbar, getActivity().getApplication());
             StoryPlayer.play();
             StoryPlayer.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
