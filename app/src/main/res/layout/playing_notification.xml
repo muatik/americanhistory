@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="220dp" >
+
+    <TextView
+        android:id="@+id/title"
+        android:text="American History"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:autoText="false"
+        android:textColor="#ffffffff"
+        android:textSize="@dimen/abc_text_size_title_material_toolbar"
+        android:layout_above="@+id/text"
+        android:layout_toRightOf="@+id/imageView"
+        android:layout_toEndOf="@+id/imageView" />
+    <TextView
+        android:id="@+id/text"
+        android:text="Columbus Sails, Others Follow, and Spain Is on Top of the World"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/pause"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingBottom="8dp"
+        android:layout_toEndOf="@+id/imageView"
+        android:layout_toRightOf="@+id/imageView" />
+
+    <ImageButton
+        android:id="@+id/pause"
+        android:src="@android:drawable/ic_media_pause"
+        android:background="@null"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="38dp"
+        android:layout_marginEnd="38dp" />
+
+    <ImageView
+        android:src="@android:drawable/ic_lock_silent_mode_off"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:paddingLeft="5dp"
+        android:paddingTop="15dp"
+        android:layout_alignTop="@+id/title"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+</RelativeLayout>
