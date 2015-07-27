@@ -1,6 +1,11 @@
 package com.muatik.americanhistory;
 
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +21,9 @@ public class MainActivity extends ActionBarActivity
 
     public final static String TAG = "americanhh";
     public static final String PREF_NAME = "ah_prefs";
+
+    public static MediaPlayerService myService;
+    boolean isBound = false;
 
     protected Bus bus;
 
@@ -47,9 +55,24 @@ public class MainActivity extends ActionBarActivity
         if (hasFragmentContainer())
             replaceActiveFrame(new FragmentTitles());
 
+        Intent intent = new Intent(this, MediaPlayerService.class);
+        bindService(intent, myConnection, Context.BIND_AUTO_CREATE);
         bus = BusProvider.get();
     }
 
+    private ServiceConnection myConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            MediaPlayerService.MyLocalBinder binder = (MediaPlayerService.MyLocalBinder) service;
+            myService = binder.getService();
+            isBound = true;
+        }
+
+        public void onServiceDisconnected(ComponentName arg0) {
+            isBound = false;
+        }
+
+    };
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

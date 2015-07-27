@@ -239,16 +239,15 @@ public class FragmentStory extends FragmentDebug
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
             audioPlay.refreshDrawableState();
             playerStatus = "playing";
-
             StoryPlayer.set(url, seekbar, getActivity().getApplication());
-            StoryPlayer.play();
+            StoryPlayer.play();/*
             StoryPlayer.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     audioPlay.setImageResource(android.R.drawable.ic_media_play);
                     StoryPlayer.resetProgress();
                 }
-            });
+            });*/
 
         } else if (playerStatus =="playing") {
             audioPlay.setImageResource(android.R.drawable.ic_media_play);

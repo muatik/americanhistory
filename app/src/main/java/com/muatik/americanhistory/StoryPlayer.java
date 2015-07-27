@@ -3,16 +3,24 @@ package com.muatik.americanhistory.Vocabulary;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.muatik.americanhistory.FragmentStory;
+import com.muatik.americanhistory.MainActivity;
+import com.muatik.americanhistory.MediaPlayerService;
 import com.muatik.americanhistory.PlayingNotification;
 import com.muatik.americanhistory.R;
 import com.muatik.americanhistory.Stories.Story;
@@ -24,32 +32,27 @@ public class StoryPlayer {
 
     private static String url;
     private static SeekBar seekbar;
-    public static MediaPlayer player;
     public static Application application;
+    public static MediaPlayerService mps;
+    public static MediaPlayer player;
+
 
     public static void set(String url, SeekBar seekbar, Application app) {
         StoryPlayer.seekbar = seekbar;
         StoryPlayer.url = url;
         StoryPlayer.application = app;
 
-        if (player != null) {
-            player.stop();
-            player.release();
-            player = null;
-        }
+        /*
+        final Application appIn=app;
+        LocalBroadcastManager.getInstance(app.getApplicationContext()).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // yanıt için geri bildirim
+                Toast.makeText(appIn.getApplicationContext(), intent.getStringExtra("url"), Toast.LENGTH_SHORT).show();
+            }
+        }, new IntentFilter("MediaPlayerService"));*/
 
-        player = new MediaPlayer();
-
-
-        try {
-            player.setDataSource(url);
-            player.prepare();
-            player.setVolume(1.0f, 1.0f);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        seekbar.setMax(player.getDuration());
+        MainActivity.myService.setMediaPlayer(url);
 
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -65,23 +68,21 @@ public class StoryPlayer {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 Log.d("mustafa", "onStopTrackingTouch + " + String.valueOf(seekBar.getProgress() / 1000));
-                player.seekTo(seekBar.getProgress());
+                MainActivity.myService.getMediaPlayer().seekTo(seekBar.getProgress());
             }
         });
-
-
     }
 
     public static void play() {
-        player.start();
+        MainActivity.myService.startPlayer();
         StoryPlayer.playingNotification();
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 //Do something after 100ms
-                if (player.isPlaying()) {
-                    seekbar.setProgress(player.getCurrentPosition());
+                if (MainActivity.myService.getMediaPlayer().isPlaying()) {
+                    seekbar.setProgress(MainActivity.myService.getMediaPlayer().getCurrentPosition());
                     handler.postDelayed(this, 600);
                 }
             }
@@ -89,11 +90,11 @@ public class StoryPlayer {
     }
 
     public static void pause() {
-        player.pause();
+        MainActivity.myService.pausePlayer();
     }
 
     public static void stop() {
-        player.stop();
+        MainActivity.myService.stopPlayer();
     }
 
     public static void resetProgress() {
