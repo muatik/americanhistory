@@ -22,11 +22,11 @@
         android:text="Columbus Sails, Others Follow, and Spain Is on Top of the World"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pause"
         android:paddingBottom="8dp"
+        android:layout_below="@+id/play"
         android:layout_toRightOf="@+id/imageView"
-        android:layout_toLeftOf="@+id/play"
-        android:layout_toStartOf="@+id/play" />
+        android:layout_alignRight="@+id/play"
+        android:layout_alignEnd="@+id/play" />
 
     <ImageButton
         android:id="@+id/play"
@@ -34,12 +34,10 @@
         android:background="@null"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="38dp"
-        android:layout_marginEnd="38dp"
-        android:paddingLeft="10dp" />
+        android:layout_alignParentEnd="true" />
 
     <ImageView
         android:src="@android:drawable/ic_lock_silent_mode_off"

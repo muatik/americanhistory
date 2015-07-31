@@ -1,10 +1,12 @@
 package com.muatik.americanhistory;
 
 import android.app.Fragment;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.muatik.americanhistory.FragmentTitles.IFragmentTitles;
+import com.muatik.americanhistory.Vocabulary.StoryPlayer;
 import com.squareup.otto.Bus;
 
 
@@ -51,12 +54,20 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        Long storyId = intent.getLongExtra("storyId", -1);
+        if (storyId != -1) {
+            onTitleSelected(storyId);
+            return;
+        }
+
         setContentView(R.layout.activity_main);
         if (hasFragmentContainer())
             replaceActiveFrame(new FragmentTitles());
 
-        Intent intent = new Intent(this, MediaPlayerService.class);
-        bindService(intent, myConnection, Context.BIND_AUTO_CREATE);
+        Intent mediaPlayerServiceIntent = new Intent(this, MediaPlayerService.class);
+        bindService(mediaPlayerServiceIntent, myConnection, Context.BIND_AUTO_CREATE);
         bus = BusProvider.get();
     }
 
@@ -123,5 +134,4 @@ public class MainActivity extends ActionBarActivity
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
     }
-
 }

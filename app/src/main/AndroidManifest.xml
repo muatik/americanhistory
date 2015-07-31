@@ -25,10 +25,8 @@
             android:enabled="true"
             android:exported="true" >
         </service>
-        <service
-            android:name=".TestService"
-            android:exported="false" >
-        </service>
+        
+        <receiver android:name=".Vocabulary.StoryPlayer$PlayingNotificationListener"></receiver>
     </application>
 
 </manifest>

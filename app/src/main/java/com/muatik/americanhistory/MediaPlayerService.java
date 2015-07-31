@@ -1,7 +1,9 @@
 package com.muatik.americanhistory;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -21,7 +23,8 @@ import java.net.URL;
  * Created by alpay on 06.07.2015.
  */
 public class MediaPlayerService extends Service  {
-    private MediaPlayer mediaPlayer;
+    private static MediaPlayer mediaPlayer;
+    Long storyId;
     String url;
     String logTag="MediaService";
     private final IBinder binder = new MyLocalBinder();
@@ -35,6 +38,14 @@ public class MediaPlayerService extends Service  {
     @Override
     public void onCreate() {
         Log.d(logTag, "oncreate");
+
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+
+
         mediaPlayer = new MediaPlayer();
     }
 
@@ -47,7 +58,6 @@ public class MediaPlayerService extends Service  {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(logTag, "onStartCommand");
-
 
         try {
             String url = intent.getStringExtra("url");
@@ -63,19 +73,14 @@ public class MediaPlayerService extends Service  {
             e.printStackTrace();
         }
 
-        /*if (!mediaPlayer.isPlaying()) {
-
-        }*/
-
-        ///Log.d("TestService-----", url);
-        //Intent serviceIntent = new Intent("MediaPlayerService");
-        //serviceIntent.putExtra("url", url);
-        //LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(serviceIntent);
         return START_STICKY;
     }
 
     public void startPlayer(){
         mediaPlayer.start();
+        Intent serviceIntent = new Intent("MediaPlayerService");
+        serviceIntent.putExtra("status", "playing");
+        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(serviceIntent);
     }
 
     public void stopPlayer(){
@@ -84,11 +89,14 @@ public class MediaPlayerService extends Service  {
 
     public void pausePlayer(){
         mediaPlayer.pause();
+        Intent serviceIntent = new Intent("MediaPlayerService");
+        serviceIntent.putExtra("status", "pause");
+        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(serviceIntent);
     }
 
-    public void setMediaPlayer(String url){
+    public void setMediaPlayer(URL url){
         try {
-            mediaPlayer.setDataSource(url);
+            mediaPlayer.setDataSource(url.toString());
             mediaPlayer.prepare();
             mediaPlayer.setVolume(1.0f, 1.0f);
         } catch (Exception e) {
@@ -101,18 +109,10 @@ public class MediaPlayerService extends Service  {
     }
 
     public void onDestroy() {
-        Log.d("MediaPlayerService-----", "onDestroy");
 
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }
         mediaPlayer.release();
     }
-
-    public void onCompletion(MediaPlayer _mediaPlayer)
-    {
-        Log.d(logTag, "onCompletion");
-        stopSelf();
-    }
-
 }

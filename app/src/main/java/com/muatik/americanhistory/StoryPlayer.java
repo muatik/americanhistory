@@ -8,12 +8,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -25,34 +27,79 @@ import com.muatik.americanhistory.PlayingNotification;
 import com.muatik.americanhistory.R;
 import com.muatik.americanhistory.Stories.Story;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by muatik on 23.06.2015.
  */
 public class StoryPlayer {
 
-    private static String url;
+    private static Story story;
     private static SeekBar seekbar;
     public static Application application;
     public static MediaPlayerService mps;
-    public static MediaPlayer player;
+    private static NotificationManager notificationmanager;
+    private static int notificationId =1;
+    private static NotificationCompat.Builder builder;
 
+    public static class PlayingNotificationListener extends BroadcastReceiver {
+        private RemoteViews remoteViews;
 
-    public static void set(String url, SeekBar seekbar, Application app) {
-        StoryPlayer.seekbar = seekbar;
-        StoryPlayer.url = url;
-        StoryPlayer.application = app;
-
-        /*
-        final Application appIn=app;
-        LocalBroadcastManager.getInstance(app.getApplicationContext()).registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                // yanıt için geri bildirim
-                Toast.makeText(appIn.getApplicationContext(), intent.getStringExtra("url"), Toast.LENGTH_SHORT).show();
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            remoteViews = new RemoteViews(StoryPlayer.application.getPackageName(),
+                    R.layout.playing_notification);
+            if (!MainActivity.myService.getMediaPlayer().isPlaying()) {
+                remoteViews.setImageViewResource(R.id.play, android.R.drawable.ic_media_pause);
+                builder.setContent(remoteViews);
+                notificationmanager.notify(notificationId, builder.build());
+                StoryPlayer.play();
+            } else if (MainActivity.myService.getMediaPlayer().isPlaying()) {
+                remoteViews.setImageViewResource(R.id.play, android.R.drawable.ic_media_play);
+                builder.setContent(remoteViews);
+                notificationmanager.notify(notificationId, builder.build());
+                StoryPlayer.pause();
             }
-        }, new IntentFilter("MediaPlayerService"));*/
+        }
+    }
 
-        MainActivity.myService.setMediaPlayer(url);
+    private static BroadcastReceiver MediaPlayerServiceListener = new BroadcastReceiver() {
+        private RemoteViews remoteViews;
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            remoteViews = new RemoteViews(StoryPlayer.application.getPackageName(),
+                    R.layout.playing_notification);
+            String status = intent.getStringExtra("status");
+            if (status =="playing") {
+                remoteViews.setImageViewResource(R.id.play, android.R.drawable.ic_media_pause);
+                builder.setContent(remoteViews);
+                notificationmanager.notify(notificationId, builder.build());
+            } if (status =="pause") {
+                remoteViews.setImageViewResource(R.id.play, android.R.drawable.ic_media_play);
+                builder.setContent(remoteViews);
+                notificationmanager.notify(notificationId, builder.build());
+            }
+        }
+    };
+
+    public static void set(Story story, SeekBar seekbar, Application app) {
+
+        LocalBroadcastManager.getInstance(app.getBaseContext()).registerReceiver(MediaPlayerServiceListener,
+                new IntentFilter("MediaPlayerService"));
+
+        StoryPlayer.seekbar = seekbar;
+        StoryPlayer.story = story;
+        StoryPlayer.application = app;
+        URL Url= null;
+        try {
+            Url = new URL("http://av.voanews.com/clips/VLE/2015/06/16/5746df4f-750a-4f17-b1ca-d717d0e69bc1.mp3");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        MainActivity.myService.setMediaPlayer(Url);
+        seekbar.setMax(MainActivity.myService.getMediaPlayer().getDuration());
 
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -97,49 +144,46 @@ public class StoryPlayer {
         MainActivity.myService.stopPlayer();
     }
 
+    public static MediaPlayer getPlayer() {
+        return MainActivity.myService.getMediaPlayer();
+    }
+
     public static void resetProgress() {
         seekbar.setProgress(0);
     }
 
     public static void playingNotification() {
-        // Using RemoteViews to bind custom layouts into Notification
         RemoteViews remoteViews = new RemoteViews(StoryPlayer.application.getPackageName(),
                 R.layout.playing_notification);
 
-        // Set Notification Title
-        String strTitle = "title";
-        // Set Notification Text
-        String strText = "text";
+        Intent intent = new Intent(StoryPlayer.application.getApplicationContext(), PlayingNotificationListener.class);
+        PendingIntent pIntent = PendingIntent.getBroadcast(StoryPlayer.application.getApplicationContext(), 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Open NotificationView Class on Notification Click
-        //Intent intent = new Intent(this, PlayingNotification.class);
-        // Send data to NotificationView Class
-        //intent.putExtra("title", strTitle);
-        // Open NotificationView.java Activity
-        //PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent,
-                //PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.play, pIntent);
+        Intent mainActivityIntent = new Intent(StoryPlayer.application.getApplicationContext(), MainActivity.class);
+        mainActivityIntent.putExtra("storyId", StoryPlayer.story.id);
+        PendingIntent mainActivityPendingIntent = PendingIntent.getActivity(StoryPlayer.application.getApplicationContext(), 0, mainActivityIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(StoryPlayer.application.getApplicationContext())
-                // Set Icon
+        builder = new NotificationCompat.Builder(StoryPlayer.application.getApplicationContext())
                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
-                        // Set Ticker Message
-                .setTicker("ticker message")
-                        // Dismiss Notification
-                .setAutoCancel(true)
-                        // Set PendingIntent into Notification
-                //.setContentIntent(pIntent)
-                        // Set RemoteViews into Notification
+                .setTicker("american history")
+                .setContentIntent(mainActivityPendingIntent)
                 .setContent(remoteViews);
 
-        // Locate and set the Text into customnotificationtext.xml TextViews
-        remoteViews.setTextViewText(R.id.title, strTitle);
-        remoteViews.setTextViewText(R.id.text, strText);
+        //remoteViews.setTextViewText(R.id.title, StoryPlayer.story.title);
+        remoteViews.setTextViewText(R.id.text, StoryPlayer.story.title);
 
-        // Create Notification Manager
-        NotificationManager notificationmanager = (NotificationManager) StoryPlayer.application.getSystemService(StoryPlayer.application.getApplicationContext().NOTIFICATION_SERVICE);
-        // Build Notification with Notification Manager
-        notificationmanager.notify(0, builder.build());
 
+        notificationmanager = (NotificationManager) StoryPlayer.application.getSystemService(
+                StoryPlayer.application.getApplicationContext().NOTIFICATION_SERVICE);
+        notificationmanager.notify(notificationId, builder.build());
     }
 
+    public static void clearNotification()
+    {
+        NotificationManager notificationManager = (NotificationManager)StoryPlayer.application.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+    }
 }
