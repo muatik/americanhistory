@@ -1,6 +1,11 @@
 package com.muatik.americanhistory;
 
 import android.app.Application;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -8,6 +13,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ActionMode;
@@ -19,11 +25,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.muatik.americanhistory.Stories.API.StoryFetchTask;
+import com.muatik.americanhistory.Stories.Collection;
 import com.muatik.americanhistory.Stories.Story;
 import com.muatik.americanhistory.Vocabulary.StoryPlayer;
 import com.squareup.otto.Subscribe;
@@ -48,12 +56,14 @@ public class FragmentStory extends FragmentDebug
     protected SharedPreferences preferences;
     protected StoryPlayer player;
     protected String playerStatus="stopped";
+    protected Story story;
 
     View mainView;
     @InjectView(R.id.detail) TextView viewDetail;
     @InjectView(R.id.title) TextView viewTitle;
     @InjectView(R.id.storyProgress) View storyProgress;
     @InjectView(R.id.storyView) View storyView;
+    @InjectView(R.id.play) ImageButton playButton;
     @InjectView(R.id.media_player) View mediaPlayerView;
     @InjectView(R.id.player_progress) SeekBar seekbar;
 
@@ -64,9 +74,24 @@ public class FragmentStory extends FragmentDebug
         return mainView;
     }
 
+    private BroadcastReceiver MediaPlayerServiceListener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String status = intent.getStringExtra("status");
+            if (status =="playing") {
+                playButton.setImageResource(android.R.drawable.ic_media_pause);
+            } if (status =="pause") {
+                playButton.setImageResource(android.R.drawable.ic_media_play);
+            }
+        }
+    };
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        LocalBroadcastManager.getInstance(getActivity().getBaseContext()).registerReceiver(MediaPlayerServiceListener,
+                new IntentFilter("MediaPlayerService"));
 
         if (getArguments() != null) {
             id = getArguments().getLong("id");
@@ -151,12 +176,18 @@ public class FragmentStory extends FragmentDebug
 
     @Override
     public void onTitleSelected(Long id) {
-        ((MainActivity) getActivity()).setActionBarTitle("loading...");
-        new StoryFetchTask(this).execute(Long.valueOf(4));
+        //((MainActivity) getActivity()).setActionBarTitle("loading...");
+        this.story = new Collection(getActivity().getApplicationContext()).get(id);
+        viewTitle.setText(story.title);
+        viewDetail.setText(story.detail);
+        storyProgress.setVisibility(View.GONE);
+        storyView.setVisibility(View.VISIBLE);
+        //new StoryFetchTask(this).execute(Long.valueOf(4));
     }
 
     @Override
     public void onStoryFetchCompleted(Story story) {
+        //this.story = story;
         ((MainActivity) getActivity()).setActionBarTitle(story.title);
         viewTitle.setText(story.title);
         viewDetail.setText(story.detail);
@@ -239,26 +270,23 @@ public class FragmentStory extends FragmentDebug
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
             audioPlay.refreshDrawableState();
             playerStatus = "playing";
-
-            StoryPlayer.set(url, seekbar, getActivity().getApplication());
+            StoryPlayer.set(story, seekbar, getActivity().getApplication());
             StoryPlayer.play();
-            StoryPlayer.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            StoryPlayer.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     audioPlay.setImageResource(android.R.drawable.ic_media_play);
+                    StoryPlayer.clearNotification();
                     StoryPlayer.resetProgress();
                 }
             });
 
-        } else if (playerStatus =="playing") {
+        } else if (StoryPlayer.getPlayer().isPlaying()) {
             audioPlay.setImageResource(android.R.drawable.ic_media_play);
-            playerStatus="pause";
             StoryPlayer.pause();
-        } else if (playerStatus =="pause") {
+        } else if (!StoryPlayer.getPlayer().isPlaying()) {
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
-            playerStatus="playing";
             StoryPlayer.play();
         }
     }
-
 }
