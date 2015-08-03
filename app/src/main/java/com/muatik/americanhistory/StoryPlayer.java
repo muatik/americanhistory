@@ -136,6 +136,10 @@ public class StoryPlayer {
         }, 600);
     }
 
+    public static void updateSeekbar() {
+        seekbar.setProgress(MainActivity.myService.getMediaPlayer().getCurrentPosition());
+    }
+
     public static void pause() {
         MainActivity.myService.pausePlayer();
     }

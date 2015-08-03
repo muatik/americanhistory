@@ -54,6 +54,7 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
         Long storyId = intent.getLongExtra("storyId", -1);
@@ -62,7 +63,6 @@ public class MainActivity extends ActionBarActivity
             return;
         }
 
-        setContentView(R.layout.activity_main);
         if (hasFragmentContainer())
             replaceActiveFrame(new FragmentTitles());
 

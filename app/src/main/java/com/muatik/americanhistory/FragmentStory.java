@@ -71,6 +71,16 @@ public class FragmentStory extends FragmentDebug
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.fragment_story, container, false);
         ButterKnife.inject(this, mainView);
+        StoryPlayer.set(story, seekbar, getActivity().getApplication());
+
+        if (StoryPlayer.getPlayer().isPlaying()) {
+            playButton.setImageResource(android.R.drawable.ic_media_pause);
+            StoryPlayer.updateSeekbar();
+
+        } else if (!StoryPlayer.getPlayer().isPlaying()) {
+            playButton.setImageResource(android.R.drawable.ic_media_play);
+            StoryPlayer.updateSeekbar();
+        }
         return mainView;
     }
 
@@ -99,7 +109,6 @@ public class FragmentStory extends FragmentDebug
         }
 
         this.setHasOptionsMenu(true);
-
         BusProvider.get().register(this);
 
         ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -269,8 +278,8 @@ public class FragmentStory extends FragmentDebug
         if (playerStatus == "stopped") {
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
             audioPlay.refreshDrawableState();
-            playerStatus = "playing";
             StoryPlayer.set(story, seekbar, getActivity().getApplication());
+            playerStatus = "playing";
             StoryPlayer.play();
             StoryPlayer.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
