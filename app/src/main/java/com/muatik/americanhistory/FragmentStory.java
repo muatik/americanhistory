@@ -40,6 +40,7 @@ import com.muatik.americanhistory.DisplayEditor.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -68,19 +69,14 @@ public class FragmentStory extends FragmentDebug
     @InjectView(R.id.player_progress) SeekBar seekbar;
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.fragment_story, container, false);
         ButterKnife.inject(this, mainView);
-        StoryPlayer.set(story, seekbar, getActivity().getApplication());
-
-        if (StoryPlayer.getPlayer().isPlaying()) {
-            playButton.setImageResource(android.R.drawable.ic_media_pause);
-            StoryPlayer.updateSeekbar();
-
-        } else if (!StoryPlayer.getPlayer().isPlaying()) {
-            playButton.setImageResource(android.R.drawable.ic_media_play);
-            StoryPlayer.updateSeekbar();
-        }
         return mainView;
     }
 
@@ -96,6 +92,7 @@ public class FragmentStory extends FragmentDebug
             }
         }
     };
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

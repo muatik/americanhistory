@@ -24,8 +24,7 @@ import java.net.URL;
  */
 public class MediaPlayerService extends Service  {
     private static MediaPlayer mediaPlayer;
-    Long storyId;
-    String url;
+    private String url = "";
     String logTag="MediaService";
     private final IBinder binder = new MyLocalBinder();
 
@@ -109,10 +108,13 @@ public class MediaPlayerService extends Service  {
     }
 
     public void onDestroy() {
-
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }
         mediaPlayer.release();
+    }
+
+    public String getUrl() {
+        return this.url;
     }
 }

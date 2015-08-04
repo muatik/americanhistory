@@ -117,7 +117,8 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onTitleSelected(Long id) {
         Log.d(TAG, String.valueOf(id));
-
+        // liste indexi 0dan başladığı için bi
+        id+=1;
         if (hasFragmentContainer()) {
             FragmentStory fragmentStory = new FragmentStory();
             Bundle bundle = new Bundle();

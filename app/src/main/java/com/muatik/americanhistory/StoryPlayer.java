@@ -38,7 +38,6 @@ public class StoryPlayer {
     private static Story story;
     private static SeekBar seekbar;
     public static Application application;
-    public static MediaPlayerService mps;
     private static NotificationManager notificationmanager;
     private static int notificationId =1;
     private static NotificationCompat.Builder builder;
@@ -87,16 +86,12 @@ public class StoryPlayer {
 
         LocalBroadcastManager.getInstance(app.getBaseContext()).registerReceiver(MediaPlayerServiceListener,
                 new IntentFilter("MediaPlayerService"));
-
         StoryPlayer.seekbar = seekbar;
         StoryPlayer.story = story;
         StoryPlayer.application = app;
         URL Url= null;
-        try {
-            Url = new URL("http://av.voanews.com/clips/VLE/2015/06/16/5746df4f-750a-4f17-b1ca-d717d0e69bc1.mp3");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        Url = story.audioUrl;
+
 
         MainActivity.myService.setMediaPlayer(Url);
         seekbar.setMax(MainActivity.myService.getMediaPlayer().getDuration());
@@ -135,7 +130,6 @@ public class StoryPlayer {
             }
         }, 600);
     }
-
     public static void updateSeekbar() {
         seekbar.setProgress(MainActivity.myService.getMediaPlayer().getCurrentPosition());
     }
@@ -151,6 +145,15 @@ public class StoryPlayer {
     public static MediaPlayer getPlayer() {
         return MainActivity.myService.getMediaPlayer();
     }
+
+    public static String getUrl() {
+        return MainActivity.myService.getUrl();
+    }
+
+    public static Story getStory() {
+        return StoryPlayer.story;
+    }
+
 
     public static void resetProgress() {
         seekbar.setProgress(0);
