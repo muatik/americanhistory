@@ -8,6 +8,7 @@ import java.net.URL;
 public class Story {
 
     public Long id;
+    public String years;
     public String title;
     public String detail;
     public URL audioUrl;

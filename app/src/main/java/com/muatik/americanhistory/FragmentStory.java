@@ -40,6 +40,7 @@ import com.muatik.americanhistory.DisplayEditor.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -68,6 +69,26 @@ public class FragmentStory extends FragmentDebug
     @InjectView(R.id.player_progress) SeekBar seekbar;
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d("------------serviceUrl", MainActivity.myService.getUrl());
+
+        if (MainActivity.myService.getMediaPlayer().isPlaying()) {
+            playButton.setImageResource(android.R.drawable.ic_media_pause);
+            Log.d("----------------","isplaying");
+            if (MainActivity.myService.getUrl() !="")
+                StoryPlayer.updateSeekbar();
+
+        } else if (!MainActivity.myService.getMediaPlayer().isPlaying()) {
+            Log.d("----------------","ispause");
+            playButton.setImageResource(android.R.drawable.ic_media_play);
+            if (MainActivity.myService.getUrl() !="")
+                StoryPlayer.updateSeekbar();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.fragment_story, container, false);
         ButterKnife.inject(this, mainView);
@@ -86,6 +107,7 @@ public class FragmentStory extends FragmentDebug
             }
         }
     };
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -99,7 +121,6 @@ public class FragmentStory extends FragmentDebug
         }
 
         this.setHasOptionsMenu(true);
-
         BusProvider.get().register(this);
 
         ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -269,8 +290,8 @@ public class FragmentStory extends FragmentDebug
         if (playerStatus == "stopped") {
             audioPlay.setImageResource(android.R.drawable.ic_media_pause);
             audioPlay.refreshDrawableState();
-            playerStatus = "playing";
             StoryPlayer.set(story, seekbar, getActivity().getApplication());
+            playerStatus = "playing";
             StoryPlayer.play();
             StoryPlayer.getPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override

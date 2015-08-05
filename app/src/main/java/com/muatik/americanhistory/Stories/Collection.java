@@ -19,8 +19,9 @@ public class Collection {
 
     public final static String TABLE_STORIES= "stories";
 
-    public static final String CID = "_id";
+    public static final String CID = "id";
     public static final String CTITLE = "title";
+    public static final String CYEARS = "years";
     public static final String CDETAIL = "detail";
     public static final String CAUDIO_URL = "audioUrl";
     public static final String CAVAILABLE_OFFLINE = "availableOffline";
@@ -36,6 +37,7 @@ public class Collection {
     public static Story BuildStory(Cursor c) {
         Story i = new Story();
         i.id = c.getLong(c.getColumnIndex(Collection.CID));
+        i.years = c.getString(c.getColumnIndex(Collection.CYEARS));
         i.title = c.getString(c.getColumnIndex(Collection.CTITLE));
         i.detail = c.getString(c.getColumnIndex(Collection.CDETAIL));
         try {

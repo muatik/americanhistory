@@ -38,7 +38,6 @@ public class StoryPlayer {
     private static Story story;
     private static SeekBar seekbar;
     public static Application application;
-    public static MediaPlayerService mps;
     private static NotificationManager notificationmanager;
     private static int notificationId =1;
     private static NotificationCompat.Builder builder;
@@ -85,18 +84,15 @@ public class StoryPlayer {
 
     public static void set(Story story, SeekBar seekbar, Application app) {
 
+        Log.d("storyplayer---------", story.audioUrl.toString());
         LocalBroadcastManager.getInstance(app.getBaseContext()).registerReceiver(MediaPlayerServiceListener,
                 new IntentFilter("MediaPlayerService"));
-
         StoryPlayer.seekbar = seekbar;
         StoryPlayer.story = story;
         StoryPlayer.application = app;
         URL Url= null;
-        try {
-            Url = new URL("http://av.voanews.com/clips/VLE/2015/06/16/5746df4f-750a-4f17-b1ca-d717d0e69bc1.mp3");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        Url = story.audioUrl;
+
 
         MainActivity.myService.setMediaPlayer(Url);
         seekbar.setMax(MainActivity.myService.getMediaPlayer().getDuration());
@@ -135,6 +131,9 @@ public class StoryPlayer {
             }
         }, 600);
     }
+    public static void updateSeekbar() {
+        seekbar.setProgress(MainActivity.myService.getMediaPlayer().getCurrentPosition());
+    }
 
     public static void pause() {
         MainActivity.myService.pausePlayer();
@@ -147,6 +146,15 @@ public class StoryPlayer {
     public static MediaPlayer getPlayer() {
         return MainActivity.myService.getMediaPlayer();
     }
+
+    public static String getUrl() {
+        return MainActivity.myService.getUrl();
+    }
+
+    public static Story getStory() {
+        return StoryPlayer.story;
+    }
+
 
     public static void resetProgress() {
         seekbar.setProgress(0);
@@ -162,6 +170,7 @@ public class StoryPlayer {
 
         remoteViews.setOnClickPendingIntent(R.id.play, pIntent);
         Intent mainActivityIntent = new Intent(StoryPlayer.application.getApplicationContext(), MainActivity.class);
+        Log.d("------------storyId", StoryPlayer.story.id.toString());
         mainActivityIntent.putExtra("storyId", StoryPlayer.story.id);
         PendingIntent mainActivityPendingIntent = PendingIntent.getActivity(StoryPlayer.application.getApplicationContext(), 0, mainActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

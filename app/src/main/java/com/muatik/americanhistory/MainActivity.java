@@ -54,15 +54,15 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
         Long storyId = intent.getLongExtra("storyId", -1);
         if (storyId != -1) {
-            onTitleSelected(storyId);
+            onTitleSelected(storyId-1);
             return;
         }
 
-        setContentView(R.layout.activity_main);
         if (hasFragmentContainer())
             replaceActiveFrame(new FragmentTitles());
 
@@ -117,7 +117,8 @@ public class MainActivity extends ActionBarActivity
     @Override
     public void onTitleSelected(Long id) {
         Log.d(TAG, String.valueOf(id));
-
+        // liste indexi 0dan başladığı için bi
+        id+=1;
         if (hasFragmentContainer()) {
             FragmentStory fragmentStory = new FragmentStory();
             Bundle bundle = new Bundle();
