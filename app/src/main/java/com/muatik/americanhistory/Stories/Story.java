@@ -7,7 +7,7 @@ import java.net.URL;
  */
 public class Story {
 
-    public int id;
+    public Long id;
     public String years;
     public String title;
     public String detail;

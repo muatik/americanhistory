@@ -36,7 +36,7 @@ public class Collection {
 
     public static Story BuildStory(Cursor c) {
         Story i = new Story();
-        i.id = c.getInt(c.getColumnIndex(Collection.CID));
+        i.id = c.getLong(c.getColumnIndex(Collection.CID));
         i.years = c.getString(c.getColumnIndex(Collection.CYEARS));
         i.title = c.getString(c.getColumnIndex(Collection.CTITLE));
         i.detail = c.getString(c.getColumnIndex(Collection.CDETAIL));

@@ -84,6 +84,7 @@ public class StoryPlayer {
 
     public static void set(Story story, SeekBar seekbar, Application app) {
 
+        Log.d("storyplayer---------", story.audioUrl.toString());
         LocalBroadcastManager.getInstance(app.getBaseContext()).registerReceiver(MediaPlayerServiceListener,
                 new IntentFilter("MediaPlayerService"));
         StoryPlayer.seekbar = seekbar;
@@ -169,6 +170,7 @@ public class StoryPlayer {
 
         remoteViews.setOnClickPendingIntent(R.id.play, pIntent);
         Intent mainActivityIntent = new Intent(StoryPlayer.application.getApplicationContext(), MainActivity.class);
+        Log.d("------------storyId", StoryPlayer.story.id.toString());
         mainActivityIntent.putExtra("storyId", StoryPlayer.story.id);
         PendingIntent mainActivityPendingIntent = PendingIntent.getActivity(StoryPlayer.application.getApplicationContext(), 0, mainActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

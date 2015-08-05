@@ -24,7 +24,7 @@ import java.net.URL;
  */
 public class MediaPlayerService extends Service  {
     private static MediaPlayer mediaPlayer;
-    private String url = "";
+    private static String url = "";
     String logTag="MediaService";
     private final IBinder binder = new MyLocalBinder();
 
@@ -93,7 +93,8 @@ public class MediaPlayerService extends Service  {
         LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(serviceIntent);
     }
 
-    public void setMediaPlayer(URL url){
+    public static void setMediaPlayer(URL url){
+        MediaPlayerService.url = url.toString();
         try {
             mediaPlayer.setDataSource(url.toString());
             mediaPlayer.prepare();
@@ -108,13 +109,9 @@ public class MediaPlayerService extends Service  {
     }
 
     public void onDestroy() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.stop();
-        }
-        mediaPlayer.release();
     }
 
-    public String getUrl() {
-        return this.url;
+    public static String getUrl() {
+        return MediaPlayerService.url;
     }
 }

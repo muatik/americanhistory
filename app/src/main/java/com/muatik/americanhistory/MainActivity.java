@@ -59,7 +59,7 @@ public class MainActivity extends ActionBarActivity
         Intent intent = getIntent();
         Long storyId = intent.getLongExtra("storyId", -1);
         if (storyId != -1) {
-            onTitleSelected(storyId);
+            onTitleSelected(storyId-1);
             return;
         }
 
