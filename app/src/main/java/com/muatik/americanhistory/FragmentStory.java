@@ -71,19 +71,19 @@ public class FragmentStory extends FragmentDebug
     @Override
     public void onResume() {
         super.onResume();
-
-        Log.d("------------serviceUrl", MainActivity.myService.getUrl());
+        String a = MainActivity.myService.getUrl();
+        Log.d("------------serviceUrl", a);
 
         if (MainActivity.myService.getMediaPlayer().isPlaying()) {
             playButton.setImageResource(android.R.drawable.ic_media_pause);
-            Log.d("----------------","isplaying");
-            if (MainActivity.myService.getUrl() !="")
+            Log.d("----------------", "playing" + a);
+            if (a !="")
                 StoryPlayer.updateSeekbar();
 
-        } else if (!MainActivity.myService.getMediaPlayer().isPlaying()) {
-            Log.d("----------------","ispause");
+        } else {
+            Log.d("----------------", "paused " + a);
             playButton.setImageResource(android.R.drawable.ic_media_play);
-            if (MainActivity.myService.getUrl() !="")
+            if (a !="")
                 StoryPlayer.updateSeekbar();
         }
     }

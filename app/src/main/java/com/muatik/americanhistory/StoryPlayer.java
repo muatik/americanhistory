@@ -132,6 +132,7 @@ public class StoryPlayer {
         }, 600);
     }
     public static void updateSeekbar() {
+        Log.d("", " ---- getting current position " + String.valueOf(MainActivity.myService.getMediaPlayer().getCurrentPosition()));
         seekbar.setProgress(MainActivity.myService.getMediaPlayer().getCurrentPosition());
     }
 
@@ -172,8 +173,10 @@ public class StoryPlayer {
         Intent mainActivityIntent = new Intent(StoryPlayer.application.getApplicationContext(), MainActivity.class);
         Log.d("------------storyId", StoryPlayer.story.id.toString());
         mainActivityIntent.putExtra("storyId", StoryPlayer.story.id);
+        mainActivityIntent.setFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent mainActivityPendingIntent = PendingIntent.getActivity(StoryPlayer.application.getApplicationContext(), 0, mainActivityIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         builder = new NotificationCompat.Builder(StoryPlayer.application.getApplicationContext())
                 .setSmallIcon(android.R.drawable.ic_lock_silent_mode_off)
